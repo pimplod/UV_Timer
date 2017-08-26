@@ -33,7 +33,7 @@
 extern volatile uint16_t tmrCount;
 extern volatile uint16_t t3Count;
 //extern volatile uint8_t mainState;
-extern volatile int16_t mainCount;
+extern volatile int16_t timerValue;
 
 enum mStates {POWER_ON = 0 , SET_TIMER, READY, TIMER_ON, TIMER_OVER, STOP_CALLED, ON_NO_TIMER};
 
@@ -56,7 +56,7 @@ typedef struct signalStruct{
     unsigned buzzer : 1;
     unsigned blink_led : 1;
     unsigned relay :1;
-    unsigned display :1;
+    unsigned blink_disp :1;
     unsigned scrollbreak :1;
     unsigned no_timer :1;
     unsigned :2;    
@@ -112,7 +112,7 @@ typedef struct buttonStruct {
 
 extern volatile t_button encoderButton;
 extern volatile t_button ledButton;
-extern volatile t_button* buts[];
+extern volatile t_button* buttons[];
 
 /*              ENCODER STRUCT          */
 typedef struct encoderStruct{
@@ -121,6 +121,7 @@ typedef struct encoderStruct{
     uint8_t fullstate;
     int8_t direction;
     int16_t count;
+    int16_t sign;
 }t_coder;
 
 extern volatile t_coder coder;
@@ -128,8 +129,7 @@ extern volatile t_coder coder;
 /*Function Declarations*/
 
 void InitStuctures(void);
-void ClearFlags(void);
-void ClearButtonsAndTimers(void);
+//void ClearFlags(void);
 void ClearButtons(void);
 void ChangeState(enum mStates newState);
 #endif	/* GLOBALS_H */

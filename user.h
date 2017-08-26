@@ -45,6 +45,6 @@ int16_t GetTime(void);
 void SaveTime(int16_t time);
 void SetTimer(void);
 void HandleButtons(void);
-void NewSet(void);
+//void NewSet(void);
 #endif	/* USER_H */
 

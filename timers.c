@@ -98,10 +98,15 @@ void TMR0_ISR(void) {
         }else{
             BUTTON_LED_ON();
         }
-        if(signal.display && flag.halfsec){
+        if(signal.blink_disp && flag.halfsec){
             DISP_OFF();
         }else{
             DISP_ON();
+        }
+        if(signal.buzzer && flag.halfsec){
+            BUZZER_ON();
+        }else{
+            BUZZER_OFF();
         }
     }
  

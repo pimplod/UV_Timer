@@ -127,12 +127,12 @@ void ShiftDisplayLeft(void){
 }
 
 void FlashDisplay(void) {
-    if(flag.halfsec == true && signal.display == true){
+    if(flag.halfsec == true && signal.blink_disp == true){
         DisplayOff();
-        signal.display = false;
-    }else if(flag.halfsec == false && signal.display == false){
+        signal.blink_disp = false;
+    }else if(flag.halfsec == false && signal.blink_disp == false){
         DisplayOn();
-        signal.display = true;
+        signal.blink_disp = true;
     }
 }
 

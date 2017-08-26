@@ -63,18 +63,17 @@ void main(void) {
                 
                 if(signal.scrollbreak){
                     signal.scrollbreak = false;
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     ChangeState(SET_TIMER);
                 }
                 break;
 
             case SET_TIMER:
-                ClearFlags();
-                NewSet();
+                SetTimer();
                 break;
 
             case READY:
-                signal.display = true;
+                signal.blink_disp = true;
                 break;
 
             case TIMER_ON:
@@ -82,14 +81,11 @@ void main(void) {
                 break;
 
             case TIMER_OVER:
-                signal.display = true;
-                Buzzer();
+                signal.blink_disp = true;
+                signal.buzzer = true;
                 break;
 
             case STOP_CALLED:
-                if (hwflag.buzzer)
-                    BUZZER_OFF();
-                
                 if (flag.ready) {
                     flag.ready = false;
                     ScrollMessage("STOPPED");
@@ -115,7 +111,7 @@ void main(void) {
                             pCount = tmrCount + 500;
                     }
                     //Clear button pressed flags once latch is released
-                    ClearButtonsAndTimers();                
+                    ClearButtons();                
                     //set on flag for NoTimer() function
                     flag.on = true;
                 }/*if(signal.no_timer)*/
@@ -147,10 +143,10 @@ void TimerOn(void) {
 
     if (flag.secTick == true) {
         flag.secTick = false;
-        mainCount -= 1;
-        DisplayValue(mainCount);
+        timerValue -= 1;
+        DisplayValue(timerValue);
     }
-    if (mainCount <= 0) {
+    if (timerValue <= 0) {
         RELAY_OFF();
         signal.blink_led = false;
         signal.buzzer = true;
@@ -166,14 +162,14 @@ void NoTimer(void){
         RELAY_ON();
         flag.secTick = false;
         signal.blink_led = true;
-        mainCount = 0;
+        timerValue = 0;
          return;
     }
     if (flag.secTick == true){
         flag.secTick = false;
-        mainCount++;
-        if(mainCount > 3)
-            DisplayValue(mainCount);
+        timerValue++;
+        if(timerValue > 3)
+            DisplayValue(timerValue);
     }
 }
 

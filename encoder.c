@@ -99,6 +99,7 @@ void InitEncoder(void) {
     coder.oldstate = coder.newstate;
     coder.direction = 0;
     coder.count = 0;
+    coder.sign = 1;
     //clear interrupt flag
     INTCONbits.RABIF = 0;
     //interrupt is low priority -- can be interrupted itself by more time sensitive flags
@@ -126,10 +127,12 @@ void EncoderISR(void) {
     ticks += coder.direction;
     if(ticks == 2){
         coder.count++;
+        coder.sign = 1;
         flag.encode = true;
         ticks = 0;
     }else if (ticks == -2){
         coder.count--;
+        coder.sign = -1;
         flag.encode = true;
         ticks = 0;
     }

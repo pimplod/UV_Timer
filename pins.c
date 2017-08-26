@@ -77,32 +77,32 @@ void InitRelay(void){
     RELAY_TRIS = OUTPUT;
 }
 
-void Buzzer(void) {
-    static uint16_t count = 0;
-    static uint8_t step = 0;
-
-    if (signal.buzzer) {
-        step = 0;
-        count = 0;
-        signal.buzzer = false;
-    }
-    
-    switch (step) {
-        case 0:
-            if (count < tmrCount) {
-                BUZZER_ON();
-                count = tmrCount + 500;
-                step = 1;
-            }
-            break;
-        case 1:
-            if (count < tmrCount) {
-                BUZZER_OFF();
-                count = tmrCount + 500;
-                step = 0;
-            }
-            break;
-    }
-}
+//void Buzzer(void) {
+//    static uint16_t count = 0;
+//    static uint8_t step = 0;
+//
+//    if (signal.buzzer) {
+//        step = 0;
+//        count = 0;
+//        signal.buzzer = false;
+//    }
+//    
+//    switch (step) {
+//        case 0:
+//            if (count < tmrCount) {
+//                BUZZER_ON();
+//                count = tmrCount + 500;
+//                step = 1;
+//            }
+//            break;
+//        case 1:
+//            if (count < tmrCount) {
+//                BUZZER_OFF();
+//                count = tmrCount + 500;
+//                step = 0;
+//            }
+//            break;
+//    }
+//}
 
 

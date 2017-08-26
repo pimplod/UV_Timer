@@ -56,23 +56,23 @@
 //}
 
 void ButtonCheck(void) {
-    buts[0]->down = !(ENC_BUTTON);
-    buts[1]->down = !(LED_BUTTON);
+    buttons[0]->down = !(ENC_BUTTON);
+    buttons[1]->down = !(LED_BUTTON);
 
     //        for (uint8_t i = 0; i < BUTTONS_LEN; i++) {
     //            buts[i]->down = ((*(buts[i]->port) & (1 << (buts[i]->pin))) != 0);
     //        }
 
     for (uint8_t i = 0; i < BUTTONS_LEN; i++) {
-        if (buts[i]->debounce > tmrCount)
+        if (buttons[i]->debounce > tmrCount)
             continue;
-        if (buts[i]->down == true && buts[i]->latched == false) {
-            buts[i]->latched = true;
-            buts[i]->debounce = tmrCount + 30;
+        if (buttons[i]->down == true && buttons[i]->latched == false) {
+            buttons[i]->latched = true;
+            buttons[i]->debounce = tmrCount + 30;
         }
-        if (buts[i]->down == false && buts[i]->latched == true) {
-            buts[i]->pressed = true;
-            buts[i]->latched = false;
+        if (buttons[i]->down == false && buttons[i]->latched == true) {
+            buttons[i]->pressed = true;
+            buttons[i]->latched = false;
         }
     }
 }
@@ -112,7 +112,7 @@ void SetTimer(void) {
     uint16_t wait;
     static uint16_t holdTime = 0;
     //get timer value saved in eeprom
-    mainCount = GetTime();
+    timerValue = GetTime();
 
     wait = tmrCount + 100;
     while (wait > tmrCount) {
@@ -120,13 +120,13 @@ void SetTimer(void) {
             wait = tmrCount + 100;
     }
     ScrollMessage("SET");
-    amount = mainCount % 10;
+    amount = timerValue % 10;
     //clear all button struct variables
-    ClearButtonsAndTimers();
+    ClearButtons();
 
     do {
         //Display timer value every loop      
-        DisplayValue(mainCount);
+        DisplayValue(timerValue);
         //flash dp of unit being changed
         if (flag.halfsec)
             DisplayDP(switchState);
@@ -135,9 +135,9 @@ void SetTimer(void) {
             case 2:
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     switchState = 1;
-                    amount = (mainCount / 10) % 10;
+                    amount = (timerValue / 10) % 10;
                     break;
                 }
                 //total changes with rotation of encoder
@@ -146,21 +146,21 @@ void SetTimer(void) {
                     amount += coder.direction;
                     if (amount < 0) {
                         amount = 9;
-                        mainCount += 9;
+                        timerValue += 9;
                     }else if (amount > 9) {
                         amount = 0;
-                        mainCount -= 9;
+                        timerValue -= 9;
                     }else {
-                        mainCount += (int16_t) (coder.direction);
+                        timerValue += (int16_t) (coder.direction);
                     }
                 }
                 break;
             case 1:
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     switchState = 0;
-                    amount = (mainCount / 100) % 10;
+                    amount = (timerValue / 100) % 10;
                     break;
                 }
                 //total changes with rotation of encoder
@@ -169,21 +169,21 @@ void SetTimer(void) {
                     amount += coder.direction;
                     if (amount < 0) {
                         amount = 9;
-                        mainCount += 90;
+                        timerValue += 90;
                     }else if (amount > 9) {
                         amount = 0;
-                        mainCount -= 90;
+                        timerValue -= 90;
                     }else {
-                        mainCount += (int16_t) (10 * coder.direction);
+                        timerValue += (int16_t) (10 * coder.direction);
                     }
                 }
                 break;
             case 0:
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     switchState = 2;
-                    amount = mainCount % 10;
+                    amount = timerValue % 10;
                     break;
                 }
                 //total changes with rotation of encoder 
@@ -192,21 +192,21 @@ void SetTimer(void) {
                     amount += coder.direction;
                     if (amount < 0) {
                         amount = 9;
-                        mainCount += 900;
+                        timerValue += 900;
                     }else if (amount > 9) {
                         amount = 0;
-                        mainCount -= 900;
+                        timerValue -= 900;
                     }else {
-                        mainCount += (int16_t) (100 * coder.direction);
+                        timerValue += (int16_t) (100 * coder.direction);
                     }
                 }
                 break;
         }//switch
         //The ledButton signals end of timer setting
         if (ledButton.pressed) {
-            DisplayValue(mainCount);
-            SaveTime(mainCount);
-            ClearButtonsAndTimers();
+            DisplayValue(timerValue);
+            SaveTime(timerValue);
+            ClearButtons();
             ChangeState(READY);
             return;
         }
@@ -229,8 +229,9 @@ void HandleButtons(void) {
     if (RELAY_LAT == true || hwflag.relay == true) {
         if (ledButton.pressed || encoderButton.pressed) {
             RELAY_OFF();
-            ClearButtonsAndTimers();
+            ClearButtons();
             signal.blink_led = false;
+            signal.buzzer = false;
             flag.ready = true;
             ChangeState(STOP_CALLED);
         }
@@ -238,34 +239,27 @@ void HandleButtons(void) {
         switch (mainState) {
             case POWER_ON:
                 if (ledButton.pressed) {
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     flag.ready = false;
                     ChangeState(SET_TIMER);
                 }
                 break;
             case READY:
                 if (ledButton.pressed) {
-                    ClearButtonsAndTimers();
-                    signal.display = false;
-//                    if (hwflag.disp_on == false) {
-//                        DisplayOn();
-//                    }
+                    ClearButtons();
+                    signal.blink_disp = false;                 
                     flag.on = true;
                     ChangeState(TIMER_ON);
                 }
                 break;
             case TIMER_OVER:
                 if (ledButton.pressed) {
-                    ClearButtonsAndTimers();
-                    signal.display = false;
-//                    if (hwflag.disp_on == false)
-//                        DisplayOn();
-                    if (hwflag.buzzer)
-                        BUZZER_OFF();
+                    ClearButtons();
+                    signal.blink_disp = false;
+                    signal.buzzer = false;                 
                     ChangeState(SET_TIMER);
                 }
                 break;
-
             case STOP_CALLED:
                 if (ledButton.latched && (holdCount < tmrCount)) {
                     DisplayClear();
@@ -274,7 +268,7 @@ void HandleButtons(void) {
                         if (ledButton.latched || ledButton.down)
                             wait = tmrCount + 300;
                     }
-                    ClearButtonsAndTimers();
+                    ClearButtons();
                     flag.ready = false;
                     ChangeState(POWER_ON);
                 }else if (!ledButton.latched) {
@@ -284,66 +278,79 @@ void HandleButtons(void) {
         }
     }
 }
+// <editor-fold defaultstate="collapsed" desc="New Set Timer Attempt">
 
+/*
 void NewSet(void) {
 
     int8_t place = 2;
     int8_t amount = 0;
     uint16_t wait;
-    uint8_t div[3] = {1,10,100};
+    int16_t div[3] = {1, 10, 100};
+    int16_t increment[3] = {100, 10, 1};
     static uint16_t holdTime = 0;
     //get timer value saved in eeprom
-    mainCount = GetTime();
+    timerValue = GetTime();
 
     wait = tmrCount + 100;
     while (wait > tmrCount) {
         if (ledButton.latched)
             wait = tmrCount + 100;
     }
-    
+
     ScrollMessage("SET");
-    amount = mainCount % 10;
-    
+    amount = timerValue % 10;
+
     //clear all button struct variables
-    ClearButtonsAndTimers();
+    ClearButtons();
+    flag.encode = false;
 
     do {
 
         //Display timer value every loop      
-        DisplayValue(mainCount);
+        DisplayValue(timerValue);
         //flash dp of unit being changed
         if (flag.halfsec)
             DisplayDP(place);
 
         //Pressing encoder button changes the increment of setting
         if (encoderButton.pressed) {
-            ClearButtonsAndTimers();
-            if (--place < 0)
+            ClearButtons();
+            if (place == 0)
                 place = 2;
+            else
+                place -= 1;
+            //            place--;
+            //            if (place < 0)
+            //                place = 2;
             //divisor = (uint8_t) pow(10, place);
-            amount = (mainCount / div[place]) % 10;
+            amount = (timerValue / div[place]) % 10;
         }
 
         //total changes with rotation of encoder
         if (flag.encode) {
             flag.encode = false;
-            amount += coder.direction;
+            amount += coder.sign;
             if (amount < 0) {
                 amount = 9;
-                mainCount += (900 / div[place]);
+                timerValue += (int16_t) (9l * increment[place]);
+                //timerValue += (int16_t)(900L / div[place]);
             }else if (amount > 9) {
                 amount = 0;
-                mainCount -= (900 / div[place]);
+                timerValue -= (int16_t) (9l * increment[place]);
+                //timerValue -= (int16_t)(900L / div[place]);
             }else {
-                mainCount += (int16_t) ((100 * coder.direction) / (int16_t) div[place]);
+                timerValue += (int16_t) ((increment[place]) * coder.sign);
+                // timerValue +=(int16_t)((100L/div[place])* coder.sign);
+                //timerValue += (int16_t) ((100 * coder.direction) / div[place]);
             }
         }
 
         //The ledButton signals end of timer setting
         if (ledButton.pressed) {
-            DisplayValue(mainCount);
-            SaveTime(mainCount);
-            ClearButtonsAndTimers();
+            DisplayValue(timerValue);
+            SaveTime(timerValue);
+            ClearButtons();
             ChangeState(READY);
             return;
         }
@@ -358,3 +365,5 @@ void NewSet(void) {
         }
     } while (1);
 }
+ */
+// </editor-fold>

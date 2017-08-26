@@ -88,6 +88,6 @@ void InitPins(void);
 void InitButtons(void);
 void InitRelay(void);
 void InitBuzzer(void);
-void Buzzer(void);
+//void Buzzer(void);
 #endif	/* PINS_H */
 

@@ -34,7 +34,7 @@
 
 volatile uint16_t tmrCount = 0;
 volatile uint16_t t3Count = 0;
-volatile int16_t mainCount = 0;
+volatile int16_t timerValue = 0;
 
 volatile enum mStates mainState = POWER_ON;
 volatile enum mStates prevState = POWER_ON;
@@ -51,7 +51,7 @@ volatile t_button encoderButton;
 
 volatile t_button ledButton;
 
-volatile t_button* buts[BUTTONS_LEN];
+volatile t_button* buttons[BUTTONS_LEN];
 
 volatile t_coder coder;
 
@@ -75,30 +75,26 @@ void InitStuctures(void){
     ledButton.pin = 0;
     ledButton.debounce = 0;
        
-    buts[0] = &encoderButton;
-    buts[1] = &ledButton;
+    buttons[0] = &encoderButton;
+    buttons[1] = &ledButton;
 }
 
-void ClearFlags(void){
-    flag.encode = false;
-    flag.on = false;
-    flag.secTick = false;
-    flag.main = false;
-}
-
-void ClearButtonsAndTimers(void){
-
-    for(uint8_t i = 0; i < BUTTONS_LEN; i++){
-        buts[i]->pressed = false;
-        buts[i]->debounce = 0;
-    }
-}
+//void ClearFlags(void){
+//    flag.encode = false;
+//    flag.on = false;
+//    flag.secTick = false;
+//    flag.main = false;
+//}
 
 void ClearButtons(void){
+
     for(uint8_t i = 0; i < BUTTONS_LEN; i++){
-        buts[i]->pressed = false;
+        buttons[i]->pressed = false;
+        buttons[i]->debounce = 0;
     }
 }
+
+
 
 void ChangeState(enum mStates newState){
     prevState = mainState;
