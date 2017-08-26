@@ -1,0 +1,12 @@
+/l.obj
+/funclist
+/build/
+/disassembly/
+/dist/
+/nbproject/Makefile-default.mk
+/nbproject/Makefile-impl.mk
+/nbproject/Makefile-local-default.mk
+/nbproject/Makefile-variables.mk
+/nbproject/Package-default.bash
+/nbproject/private/
+/debug/
