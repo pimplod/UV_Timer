@@ -47,7 +47,7 @@
 #define INTERNAL_OSC
 //#define PROTOBOARD
 //#define BEGINNG_EEP
-
+#define SAVE_ADDR       0x01
 #define LAST_ONES       0x03
 #define LAST_TENS       0x04
 #define LAST_HUND       0x05

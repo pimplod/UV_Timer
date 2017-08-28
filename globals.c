@@ -5,14 +5,14 @@
  *
  *  @Project: 
  *
- *     TODO -> Project Name %<%PROJECT_NAME%>% %<%DEFAULT_NAME%>%
+ *     UV_Timer
  *
  *  @Description:
  *
- *     Target       : TODO -> Provide MCU
+ *     Target       : PIC18F14K22
  *     Compiler     : XC8
  *     IDE          : MPLABX v3.35
- *     Created      : July 3, 2017
+ *     Created      : 8/27/17 4:22 AM
  *
  *  R Hanlen <implod@gmail.com>
  * ***************************************************************************/
@@ -28,6 +28,7 @@
 
 //Project
 #include "globals.h"
+
 /* ***********************************************************************//**
  *              @Section: GLOBAL VARIABLES
  *****************************************************************************/
@@ -35,13 +36,15 @@
 volatile uint16_t tmrCount = 0;
 volatile uint16_t t3Count = 0;
 volatile int16_t timerValue = 0;
+volatile uint8_t eeSaveAddr = 0;
+volatile uint8_t dpDigit = 0; 
 
 volatile enum mStates mainState = POWER_ON;
 volatile enum mStates prevState = POWER_ON;
 
-volatile t_flags flag = {0, 0, 0, 0, 0, 0};
+volatile t_flags flag = {0, 0, 0, 0, 0, 0, 0};
 
-volatile t_signal signal = {0, 0, 0, 0, 0, 0};
+volatile t_signal signal = {0, 0, 0, 0, 0, 0, 0};
 
 volatile t_hwflags hwflag = {0, 0, 0, 0, 0};
 
@@ -59,44 +62,45 @@ volatile t_coder coder;
  *              @Section: FUNCTION DEFINITIONS
  *****************************************************************************/
 
+void InitStuctures(void) {
 
-void InitStuctures(void){
-	encoderButton.down = false;
+    encoderButton.down = false;
     encoderButton.latched = false;
     encoderButton.pressed = false;
     encoderButton.port = &PORTB;
     encoderButton.pin = 6;
     encoderButton.debounce = 0;
-    
+
     ledButton.down = false;
     ledButton.latched = false;
     ledButton.pressed = false;
     ledButton.port = &PORTC;
     ledButton.pin = 0;
     ledButton.debounce = 0;
-       
+
     buttons[0] = &encoderButton;
     buttons[1] = &ledButton;
 }
 
-//void ClearFlags(void){
-//    flag.encode = false;
-//    flag.on = false;
-//    flag.secTick = false;
-//    flag.main = false;
-//}
+void ClearButtons(void) {
 
-void ClearButtons(void){
-
-    for(uint8_t i = 0; i < BUTTONS_LEN; i++){
+    for (uint8_t i = 0; i < BUTTONS_LEN; i++) {
         buttons[i]->pressed = false;
         buttons[i]->debounce = 0;
     }
 }
 
-
-
-void ChangeState(enum mStates newState){
+void ChangeState(enum mStates newState) {
     prevState = mainState;
     mainState = newState;
+}
+
+void ClearLatched(void){
+    uint16_t wait;
+    wait = tmrCount+100;
+    while (wait > tmrCount) {
+        if (ledButton.latched)
+            wait = tmrCount + 100;
+    }
+    ClearButtons();
 }

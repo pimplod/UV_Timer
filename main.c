@@ -76,7 +76,7 @@ void main(void) {
                 signal.blink_disp = true;
                 break;
 
-            case TIMER_ON:
+            case ON_TIMED:
                 TimerOn();
                 break;
 
@@ -100,23 +100,15 @@ void main(void) {
                 }
                 break;
                 
-            case ON_NO_TIMER:
+            case ON_NT:
                 //flag set only when state changes 
-                if (signal.no_timer) {
-                    signal.no_timer = false;
-                    //Small delay loop to allow release of latched button 
-                    pCount = tmrCount + 500;
-                    while (pCount > tmrCount) {
-                        if (ledButton.down || ledButton.latched)
-                            pCount = tmrCount + 500;
-                    }
-                    //Clear button pressed flags once latch is released
-                    ClearButtons();                
+                if (flag.no_timer) {
+                    flag.no_timer = false;                              
+                    ClearLatched();               
                     //set on flag for NoTimer() function
                     flag.on = true;
                 }/*if(signal.no_timer)*/
                 
-                //Main Function for ON_NO_TIMER Case 
                 NoTimer();              
                 break;
             default:

@@ -106,15 +106,15 @@ void ScrollMessage(const char *string) {
             maxBuffer[x] = maxBuffer[x + 1];
         }
         maxBuffer[BUFFER_MAX] = segmentFont[digit - 32];
-        DisplaySync();
-        delayCount = t3Count + 15;
+        //DisplaySync();
+        delayCount = t3Count + 14;
         while (delayCount > t3Count);
         i++;
     }
     
     for (i = 0; i < 3; i++) {
         ShiftDisplayLeft();
-        delayCount = t3Count + 15;
+        delayCount = t3Count + 14;
         while (delayCount > t3Count);
     }
 }
@@ -126,15 +126,6 @@ void ShiftDisplayLeft(void){
         maxBuffer[BUFFER_MAX] = 0x00;
 }
 
-void FlashDisplay(void) {
-    if(flag.halfsec == true && signal.blink_disp == true){
-        DisplayOff();
-        signal.blink_disp = false;
-    }else if(flag.halfsec == false && signal.blink_disp == false){
-        DisplayOn();
-        signal.blink_disp = true;
-    }
-}
 
 void DisplayOn(void) {
 

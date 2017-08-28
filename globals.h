@@ -5,14 +5,14 @@
  *
  *  @Project: 
  *
- *     TODO -> Project Name
+ *     UV_Timer
  *
  *  @Description:
  *
  *     Target       : PIC18F14K22
  *     Compiler     : XC8
  *     IDE          : MPLABX v3.35
- *     Created      : July 3, 2017
+ *     Created      : 8/27/17 4:21 AM
  *
  *  R Hanlen <implod@gmail.com>
  * ***************************************************************************/
@@ -27,18 +27,20 @@
 #include "system.h"
 
 /**
-        @Section: Macro Declarations
+        @Section: Variables and Datat Structures
  */
 
 extern volatile uint16_t tmrCount;
 extern volatile uint16_t t3Count;
-//extern volatile uint8_t mainState;
 extern volatile int16_t timerValue;
+extern volatile uint8_t eeSaveAddr;
+extern volatile uint8_t dpDigit;
 
-enum mStates {POWER_ON = 0 , SET_TIMER, READY, TIMER_ON, TIMER_OVER, STOP_CALLED, ON_NO_TIMER};
+enum mStates {POWER_ON = 0 , SET_TIMER, READY, ON_TIMED, TIMER_OVER, STOP_CALLED, ON_NT};
 
 extern volatile enum mStates mainState; 
 extern volatile enum mStates prevState;
+
 /*      GENERAL SYSTEM bitFLAGS        */
 typedef struct flagStruct {
     unsigned secTick : 1;
@@ -47,11 +49,13 @@ typedef struct flagStruct {
     unsigned on : 1;
     unsigned main : 1;
     unsigned ready : 1;
-    unsigned : 2;
+    unsigned no_timer :1;
+    unsigned : 1;
 } t_flags;
 
 extern volatile t_flags flag;
-
+ 
+/*       HARDWARE SIGNAL BITFLAGS           */
 typedef struct signalStruct{
     unsigned buzzer : 1;
     unsigned blink_led : 1;
@@ -59,13 +63,14 @@ typedef struct signalStruct{
     unsigned blink_disp :1;
     unsigned scrollbreak :1;
     unsigned no_timer :1;
-    unsigned :2;    
+    unsigned dp_blink :1;
+    unsigned :1;    
 }t_signal;
 
 extern volatile t_signal signal;
 
 
-
+/*       HARDWARE STATUS BITFLAGS          */
 typedef struct hwflagStruct{
     unsigned disp_on        : 1;
     unsigned buzzer         : 1;
@@ -85,17 +90,6 @@ typedef struct timeStruct {
 } t_time;
 
 extern volatile t_time time;
-
-/*      MAIN TIMER STRUCT           */
-//typedef struct countDownStruct {
-//    int16_t total;
-//    uint8_t hundreds;
-//    uint8_t tens;
-//    uint8_t ones;
-//    int8_t marker;
-//} t_countDown;
-
-//extern volatile t_countDown countDown;
 
 /*      BUTTON STRUCT               */
 typedef struct buttonStruct {
@@ -126,10 +120,10 @@ typedef struct encoderStruct{
 
 extern volatile t_coder coder;
 
-/*Function Declarations*/
+/*               FUNCTION DECLARATIONS            */
 
 void InitStuctures(void);
-//void ClearFlags(void);
 void ClearButtons(void);
+void ClearLatched(void);
 void ChangeState(enum mStates newState);
 #endif	/* GLOBALS_H */

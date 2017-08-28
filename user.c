@@ -77,13 +77,13 @@ void ButtonCheck(void) {
     }
 }
 
-int16_t GetTime(void) {
+int16_t GetTime(uint8_t addr) {
     uint8_t read = 0;
     int16_t value = 0;
     uint8_t scale = 1;
 
     for (uint8_t i = 0; i < 3; i++) {
-        read = EEPROM_READ((LAST_ONES) + i);
+        read = EEPROM_READ((addr) + i);
         if (read == 0xFF)
             read = 0;
         value += (int16_t) (read * scale);
@@ -92,51 +92,54 @@ int16_t GetTime(void) {
     return value;
 }
 
-void SaveTime(int16_t time) {
+void SaveTime(int16_t time, uint8_t addr) {
     uint8_t value;
-
+    
+    EEPROM_WRITE(SAVE_ADDR, addr);
     value = (uint8_t) (time % 10);
-    EEPROM_WRITE(LAST_ONES, value);
+    EEPROM_WRITE(addr, value);
     value = (uint8_t) (time / 10) % 10;
-    EEPROM_WRITE(LAST_TENS, value);
+    EEPROM_WRITE(addr+1, value);
     value = (uint8_t) (time / 100) % 10;
-    EEPROM_WRITE(LAST_HUND, value);
+    EEPROM_WRITE(addr+2, value);
 
 
 }
 
+void ChooseOperation(void){
+    
+}
+
 void SetTimer(void) {
-    // switch variable that determines the increment value
-    uint8_t switchState = 2;
+  
     int8_t amount = 0;
-    uint16_t wait;
     static uint16_t holdTime = 0;
-    //get timer value saved in eeprom
-    timerValue = GetTime();
-
-    wait = tmrCount + 100;
-    while (wait > tmrCount) {
-        if (ledButton.latched)
-            wait = tmrCount + 100;
-    }
+    
+    //get last timer value saved in the device eeprom
+    eeSaveAddr = EEPROM_READ(SAVE_ADDR); 
+    timerValue = GetTime(eeSaveAddr);
+    
+    ClearLatched();
     ScrollMessage("SET");
+    ScrollMessage("TIMER");
+    
+    //put digit user is changing in var amount
     amount = timerValue % 10;
-    //clear all button struct variables
-    ClearButtons();
-
+    //digit used in switch case loop and signal for blinking dp
+    dpDigit = 2;
+    //signal to blink dp on digit being changed
+    signal.dp_blink = true;
+    
     do {
         //Display timer value every loop      
         DisplayValue(timerValue);
-        //flash dp of unit being changed
-        if (flag.halfsec)
-            DisplayDP(switchState);
-
-        switch (switchState) {
+    
+        switch (dpDigit) {
             case 2:
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
                     ClearButtons();
-                    switchState = 1;
+                    dpDigit = 1;
                     amount = (timerValue / 10) % 10;
                     break;
                 }
@@ -159,7 +162,7 @@ void SetTimer(void) {
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
                     ClearButtons();
-                    switchState = 0;
+                    dpDigit = 0;
                     amount = (timerValue / 100) % 10;
                     break;
                 }
@@ -182,7 +185,7 @@ void SetTimer(void) {
                 //Pressing encoder button changes the increment of setting
                 if (encoderButton.pressed) {
                     ClearButtons();
-                    switchState = 2;
+                    dpDigit = 2;
                     amount = timerValue % 10;
                     break;
                 }
@@ -204,17 +207,19 @@ void SetTimer(void) {
         }//switch
         //The ledButton signals end of timer setting
         if (ledButton.pressed) {
+             signal.dp_blink = false;
+            ClearButtons();      
             DisplayValue(timerValue);
-            SaveTime(timerValue);
-            ClearButtons();
+            SaveTime(timerValue,eeSaveAddr);         
             ChangeState(READY);
             return;
         }
 
         if (ledButton.latched && (holdTime < tmrCount)) {
+            signal.dp_blink = false;
             DisplayMsg(" ON");
-            signal.no_timer = true;
-            ChangeState(ON_NO_TIMER);
+            flag.no_timer= true;
+            ChangeState(ON_NT);
             return;
         }else if (!ledButton.latched) {
             holdTime = tmrCount + 1500L;
@@ -249,7 +254,7 @@ void HandleButtons(void) {
                     ClearButtons();
                     signal.blink_disp = false;                 
                     flag.on = true;
-                    ChangeState(TIMER_ON);
+                    ChangeState(ON_TIMED);
                 }
                 break;
             case TIMER_OVER:
@@ -263,12 +268,7 @@ void HandleButtons(void) {
             case STOP_CALLED:
                 if (ledButton.latched && (holdCount < tmrCount)) {
                     DisplayClear();
-                    uint16_t wait = tmrCount + 300;
-                    while (wait > tmrCount) {
-                        if (ledButton.latched || ledButton.down)
-                            wait = tmrCount + 300;
-                    }
-                    ClearButtons();
+                    ClearLatched();
                     flag.ready = false;
                     ChangeState(POWER_ON);
                 }else if (!ledButton.latched) {

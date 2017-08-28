@@ -52,7 +52,6 @@ void DisplayChar(uint8_t digit, uint8_t value);
 void DisplayMsg(const char *msg);
 void ScrollMessage(const char *string);
 void ShiftDisplayLeft(void);
-void FlashDisplay(void);
 void DisplayOn(void);
 void DisplayOff(void);
 void DisplayClear(void);

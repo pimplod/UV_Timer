@@ -1,31 +1,32 @@
 /**************************************************************************//**
  *  @File:
  *
- *     user.h
+ *     relay.h
  *
  *  @Project: 
  *
- *     TODO -> Project Name
+ *     ${project.name}
  *
  *  @Description:
  *
  *     Target       : TODO -> Provide MCU
  *     Compiler     : XC8
  *     IDE          : MPLABX v3.35
- *     Created      : July 17, 2017
+ *     Created      : August 27, 2017
  *
  *  R Hanlen <implod@gmail.com>
  * ***************************************************************************/
 
-#ifndef USER_H
-#define	USER_H
+#ifndef RELAY_H
+#define	RELAY_H
 
 /**
         @Section: Included Files
  */
 
-
-#include "system.h"
+#include <xc.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /**
         @Section: Macro Declarations
@@ -36,14 +37,5 @@
         @Section: System APIs
  */
 
-//void ButtonCheck(volatile t_button * button);
-
-void ButtonCheck(void);
-int16_t GetTime(uint8_t addr);
-void SaveTime(int16_t time, uint8_t addr);
-void ChooseOperation(void);
-void SetTimer(void);
-void HandleButtons(void);
-//void NewSet(void);
-#endif	/* USER_H */
+#endif	/* RELAY_H */
 

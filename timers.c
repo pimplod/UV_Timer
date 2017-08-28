@@ -89,27 +89,27 @@ void TMR0_ISR(void) {
 
     INTCONbits.TMR0IF = 0;
     tmrCount++;
-    if(tmrCount % 2)
+    if (tmrCount % 2)
         ButtonCheck();
     if (!(tmrCount % 500)) {
         flag.halfsec = ~flag.halfsec;
         if (signal.blink_led && flag.halfsec) {
             BUTTON_LED_OFF();
-        }else{
+        }else {
             BUTTON_LED_ON();
         }
-        if(signal.blink_disp && flag.halfsec){
+        if (signal.blink_disp && flag.halfsec) {
             DISP_OFF();
-        }else{
+        }else {
             DISP_ON();
         }
-        if(signal.buzzer && flag.halfsec){
+        if (signal.buzzer && flag.halfsec) {
             BUZZER_ON();
-        }else{
+        }else {
             BUZZER_OFF();
         }
     }
- 
+    
     TMR0L = TIMER0_RELOAD_VALUE;
 }
 
@@ -227,6 +227,11 @@ void InitTMR3(void) {
 
 void TMR3_ISR(void) {
     PIR2bits.TMR3IF = 0;
+    
+    if (signal.dp_blink && flag.halfsec) {
+        DisplayDP(dpDigit);
+    }
+    
     SYNC_DISP();
 
     t3Count++;
