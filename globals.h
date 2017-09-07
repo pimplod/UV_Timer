@@ -36,7 +36,7 @@ extern volatile int16_t timerValue;
 extern volatile uint8_t eeSaveAddr;
 extern volatile uint8_t dpDigit;
 
-enum mStates {POWER_ON = 0 , SET_TIMER, READY, ON_TIMED, TIMER_OVER, STOP_CALLED, ON_NT};
+enum mStates {POWER_ON = 0 , CHOOSE_OP, SET_TIMER, READY, ON_TIMED, TIMER_OVER, STOP_CALLED, ON_NT};
 
 extern volatile enum mStates mainState; 
 extern volatile enum mStates prevState;
@@ -122,7 +122,7 @@ extern volatile t_coder coder;
 
 /*               FUNCTION DECLARATIONS            */
 
-void InitStuctures(void);
+void InitHardwareVars(void);
 void ClearButtons(void);
 void ClearLatched(void);
 void ChangeState(enum mStates newState);

@@ -40,7 +40,7 @@
 
 void ButtonCheck(void);
 int16_t GetTime(uint8_t addr);
-void SaveTime(int16_t time, uint8_t addr);
+void SaveTime(int16_t time);
 void ChooseOperation(void);
 void SetTimer(void);
 void HandleButtons(void);

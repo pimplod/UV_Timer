@@ -47,11 +47,11 @@ void InitSystem(void){
     InitTMR0();
     InitTMR1();
     InitTMR3();
-    InitEncoder();
-    InitButtons();
-    InitBuzzer();
-    InitRelay();
-    InitStuctures();
+//    InitEncoder();
+//    InitButtons();
+//    InitBuzzer();
+//    InitRelay();
+//    InitHardwareVars();
     //INTERRUPT_LOW_ENABLE();
     //INTERRUPT_HIGH_ENABLE();
 }
@@ -72,7 +72,14 @@ void InitOscillator(void){
     OSCTUNEbits.INTSRC = 0;
 }
 
-
+void InitHardware(void){
+    
+    InitEncoder();
+    InitButtons();
+    InitBuzzer();
+    InitRelay();
+    InitHardwareVars();
+}
 
 
 

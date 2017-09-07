@@ -62,8 +62,15 @@ volatile t_coder coder;
  *              @Section: FUNCTION DEFINITIONS
  *****************************************************************************/
 
-void InitStuctures(void) {
+void InitHardwareVars(void) {
 
+     //initialize variables within the encoder struct
+    coder.newstate = READ_ENCODER();
+    coder.oldstate = coder.newstate;
+    coder.direction = 0;
+    coder.count = 0;
+    coder.sign = 1;
+    
     encoderButton.down = false;
     encoderButton.latched = false;
     encoderButton.pressed = false;
@@ -80,6 +87,8 @@ void InitStuctures(void) {
 
     buttons[0] = &encoderButton;
     buttons[1] = &ledButton;
+    
+    eeSaveAddr = EEPROM_READ(SAVE_ADDR);
 }
 
 void ClearButtons(void) {

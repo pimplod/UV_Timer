@@ -92,48 +92,132 @@ int16_t GetTime(uint8_t addr) {
     return value;
 }
 
-void SaveTime(int16_t time, uint8_t addr) {
+void SaveTime(int16_t time) {
     uint8_t value;
+    
+    uint8_t addr = eeSaveAddr + SAVE_SIZE;
+    if(addr > EE_LAST_SAVE_ADDR)
+        addr = EE_FIRST_SAVE_ADDR;
     
     EEPROM_WRITE(SAVE_ADDR, addr);
     value = (uint8_t) (time % 10);
     EEPROM_WRITE(addr, value);
     value = (uint8_t) (time / 10) % 10;
-    EEPROM_WRITE(addr+1, value);
+    EEPROM_WRITE(addr + 1, value);
     value = (uint8_t) (time / 100) % 10;
-    EEPROM_WRITE(addr+2, value);
+    EEPROM_WRITE(addr + 2, value);
 
 
 }
 
-void ChooseOperation(void){
-    
+void ChooseOperation(void) {
+    int8_t operation = 1;
+    uint8_t initial = true;
+   // uint16_t displayTimer = 0;
+    int16_t timeReturned = 0;
+    uint8_t address = 0;
+
+    ClearLatched();
+    flag.encode = false;
+    address = eeSaveAddr;
+
+    do {
+
+        switch (operation) {
+            case 0:
+                if(initial){
+                    initial = false;
+                    SpinCCW(0x07);
+                    flag.encode = false;
+                }
+                DisplayMsg(" ON");
+                           
+                if (ledButton.pressed) {
+                    ClearButtons();
+                    flag.no_timer = true;
+                    ChangeState(ON_NT);
+                    return;
+                }
+                break;
+                
+            case 1:
+                if(initial){
+                    initial = false;
+                    SpinCCW(0x07);
+                    flag.encode = false;
+                }
+                 DisplayMsg("NEW");
+
+                if (ledButton.pressed) {
+                    ClearButtons();
+                    ChangeState(SET_TIMER);
+                    return;
+                }
+                break;
+
+            case 2:
+                if (initial) {
+                    initial = false;
+                     SpinCW(0x07);
+                     flag.encode = false;
+                    timeReturned = GetTime(address);
+                    DisplayValue(timeReturned);
+                }
+                if (ledButton.pressed) {
+                    ClearButtons();
+                    timerValue = timeReturned;
+                    ChangeState(READY);
+                    return;
+                }
+                break;
+
+        }
+
+        if (flag.encode) {
+            flag.encode = false;
+            initial = true;
+            if (operation == 2) {
+                if ((address == EE_FIRST_SAVE_ADDR) && (coder.direction == -1)) {
+                    operation = 1;
+                }else if ((address == EE_LAST_SAVE_ADDR) && (coder.direction == 1)) {
+                    operation = 1;
+                }else {
+                    address += (3 * coder.direction);
+                }
+            }else {
+                operation += coder.direction;
+                if (operation < 0)
+                    operation = 0;
+            }
+
+        }
+
+    } while (1);
 }
 
 void SetTimer(void) {
-  
+
     int8_t amount = 0;
     static uint16_t holdTime = 0;
-    
+
     //get last timer value saved in the device eeprom
-    eeSaveAddr = EEPROM_READ(SAVE_ADDR); 
+    //eeSaveAddr = EEPROM_READ(SAVE_ADDR);
     timerValue = GetTime(eeSaveAddr);
-    
+
     ClearLatched();
-    ScrollMessage("SET");
-    ScrollMessage("TIMER");
-    
+    ScrollMessage("SET TIMER");
+
     //put digit user is changing in var amount
     amount = timerValue % 10;
     //digit used in switch case loop and signal for blinking dp
     dpDigit = 2;
     //signal to blink dp on digit being changed
     signal.dp_blink = true;
-    
+
     do {
         //Display timer value every loop      
         DisplayValue(timerValue);
-    
+
         switch (dpDigit) {
             case 2:
                 //Pressing encoder button changes the increment of setting
@@ -207,10 +291,10 @@ void SetTimer(void) {
         }//switch
         //The ledButton signals end of timer setting
         if (ledButton.pressed) {
-             signal.dp_blink = false;
-            ClearButtons();      
+            signal.dp_blink = false;
+            ClearButtons();
             DisplayValue(timerValue);
-            SaveTime(timerValue,eeSaveAddr);         
+            SaveTime(timerValue);
             ChangeState(READY);
             return;
         }
@@ -218,7 +302,7 @@ void SetTimer(void) {
         if (ledButton.latched && (holdTime < tmrCount)) {
             signal.dp_blink = false;
             DisplayMsg(" ON");
-            flag.no_timer= true;
+            flag.no_timer = true;
             ChangeState(ON_NT);
             return;
         }else if (!ledButton.latched) {
@@ -246,13 +330,13 @@ void HandleButtons(void) {
                 if (ledButton.pressed) {
                     ClearButtons();
                     flag.ready = false;
-                    ChangeState(SET_TIMER);
+                    ChangeState(CHOOSE_OP);
                 }
                 break;
             case READY:
                 if (ledButton.pressed) {
                     ClearButtons();
-                    signal.blink_disp = false;                 
+                    signal.blink_disp = false;
                     flag.on = true;
                     ChangeState(ON_TIMED);
                 }
@@ -261,15 +345,15 @@ void HandleButtons(void) {
                 if (ledButton.pressed) {
                     ClearButtons();
                     signal.blink_disp = false;
-                    signal.buzzer = false;                 
-                    ChangeState(SET_TIMER);
+                    signal.buzzer = false;
+                    ChangeState(CHOOSE_OP);
                 }
                 break;
             case STOP_CALLED:
                 if (ledButton.latched && (holdCount < tmrCount)) {
                     DisplayClear();
                     ClearLatched();
-                    flag.ready = false;
+                    flag.ready = true;
                     ChangeState(POWER_ON);
                 }else if (!ledButton.latched) {
                     holdCount = tmrCount + 750L;

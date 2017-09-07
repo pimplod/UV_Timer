@@ -65,7 +65,7 @@
 #define USE_DECODE          0
 #endif
 #ifndef INITIAL_INTENSITY
-#define INITIAL_INTENSITY   9
+#define INITIAL_INTENSITY   12
 #endif
 /*
 *********************************************************************************************************

@@ -48,25 +48,25 @@ void InitDisplay(void) {
 
 void DisplayDP(uint8_t digit) {
 
-    set_bit((maxBuffer[digit]),7);
-    
+    set_bit((maxBuffer[digit]), 7);
+
 }
 
 void DisplayNumber(uint8_t digit, uint8_t value) {
 
     uint8_t digitValue = digitsArray[value];
-    maxBuffer[digit] = digitValue; 
+    maxBuffer[digit] = digitValue;
 
 }
 
 void DisplayValue(uint16_t number) {
-    
+
     uint8_t hund = (number / 100) % 10;
     uint8_t tens = (number / 10) % 10;
     uint8_t ones = number % 10;
     maxBuffer[0] = digitsArray[hund];
     maxBuffer[1] = digitsArray[tens];
-    maxBuffer[2] = digitsArray[ones]; 
+    maxBuffer[2] = digitsArray[ones];
 }
 
 void DisplayChar(uint8_t digit, uint8_t value) {
@@ -93,11 +93,9 @@ void ScrollMessage(const char *string) {
     uint16_t delayCount;
 
     DisplayClear();
-    
+
     while (string[i] != '\0') {
-        if (ledButton.pressed == true || encoderButton.pressed == true){
-            ledButton.pressed = false;
-            encoderButton.pressed = false;
+        if (ledButton.pressed == true || encoderButton.pressed == true || flag.encode == true) {
             signal.scrollbreak = true;
             return;
         }
@@ -107,25 +105,24 @@ void ScrollMessage(const char *string) {
         }
         maxBuffer[BUFFER_MAX] = segmentFont[digit - 32];
         //DisplaySync();
-        delayCount = t3Count + 14;
+        delayCount = t3Count + 10;
         while (delayCount > t3Count);
         i++;
     }
-    
+
     for (i = 0; i < 3; i++) {
         ShiftDisplayLeft();
-        delayCount = t3Count + 14;
+        delayCount = t3Count + 10;
         while (delayCount > t3Count);
     }
 }
 
-void ShiftDisplayLeft(void){
+void ShiftDisplayLeft(void) {
     for (uint8_t x = 0; x < BUFFER_MAX; x++) {
-            maxBuffer[x] = maxBuffer[x + 1];
-        }
-        maxBuffer[BUFFER_MAX] = 0x00;
+        maxBuffer[x] = maxBuffer[x + 1];
+    }
+    maxBuffer[BUFFER_MAX] = 0x00;
 }
-
 
 void DisplayOn(void) {
 
@@ -133,8 +130,8 @@ void DisplayOn(void) {
     hwflag.disp_on = true;
 }
 
-void DisplayOff(void){
-    
+void DisplayOff(void) {
+
     MAX7219_Shutdown();
     hwflag.disp_on = false;
 }
@@ -149,4 +146,42 @@ void DisplayClear(void) {
 void DisplaySync(void) {
 
     MAX7219_SyncBuffer();
+}
+
+
+void SpinCCW(uint8_t digits) {
+    uint16_t delayCount;
+
+    DisplayClear();
+    for (uint8_t i = 1; i < 7; i++) {
+        if(digits & DISP_HUND)
+            maxBuffer[0] = (0x01 << i);
+        if(digits & DISP_TENS)
+            maxBuffer[1] = (0x01 << i);
+        if(digits & DISP_ONES)
+            maxBuffer[2] = (0x01 << i);
+        
+        delayCount = t3Count + 2;
+        while (delayCount > t3Count);
+
+    }
+}
+
+void SpinCW(uint8_t digits) {
+    uint16_t delayCount;
+
+    DisplayClear();
+    for (uint8_t i = 6; i > 0; i--) {
+        if(digits & DISP_HUND)
+            maxBuffer[0] = (0x01 << i);
+        if(digits & DISP_TENS)
+            maxBuffer[1] = (0x01 << i);
+        if(digits & DISP_ONES)
+            maxBuffer[2] = (0x01 << i);
+        
+        delayCount = t3Count + 2;
+        while (delayCount > t3Count);
+
+    }
+
 }

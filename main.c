@@ -43,6 +43,8 @@ void main(void) {
     INTERRUPT_DISABLE();
     // Initialize the uC (i.e. Oscillator,Periphials, Ports)
     InitSystem();
+    // Initialize Buttons, Encoder, Buzzer
+    InitHardware();
     //Open Communication with Display Driver
     InitDisplay();
     //Restart all programmed interrupts
@@ -56,18 +58,23 @@ void main(void) {
                 if (flag.ready) {
                     flag.ready = false;
                     ScrollMessage("READY");
-                    pCount = tmrCount + 400;
-                }else if (pCount < tmrCount){
+                    DisplayMsg("RDY");
+                    pCount = t3Count + 400;
+                }else if (pCount < t3Count){
                     flag.ready = true;
                 }
                 
                 if(signal.scrollbreak){
                     signal.scrollbreak = false;
-                    ClearButtons();
-                    ChangeState(SET_TIMER);
+                     flag.ready = true;
+
                 }
                 break;
-
+                
+            case CHOOSE_OP:
+                ChooseOperation();
+                break;
+                
             case SET_TIMER:
                 SetTimer();
                 break;

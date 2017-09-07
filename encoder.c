@@ -95,11 +95,11 @@ void InitEncoder(void) {
     ENC_A_IOC = ENABLED;
     ENC_B_IOC = ENABLED;
     //initialize varaibles within the encoder struct
-    coder.newstate = READ_ENCODER();
-    coder.oldstate = coder.newstate;
-    coder.direction = 0;
-    coder.count = 0;
-    coder.sign = 1;
+//    coder.newstate = READ_ENCODER();
+//    coder.oldstate = coder.newstate;
+//    coder.direction = 0;
+//    coder.count = 0;
+//    coder.sign = 1;
     //clear interrupt flag
     INTCONbits.RABIF = 0;
     //interrupt is low priority -- can be interrupted itself by more time sensitive flags

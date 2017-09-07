@@ -31,8 +31,11 @@
  */
 #define NUMBER_OF_DIGITS    3
 #define USE_DECODE          0
-#define INITIAL_INTENSITY   7
+#define INITIAL_INTENSITY   12
 #define BUFFER_MAX          2
+#define DISP_ONES           0x01
+#define DISP_TENS           0x02
+#define DISP_HUND           0x04
 
 #define PRNTMSG(msg)    DisplayMsg(#msg)
 #define SCROLLMSG(msg)  ScrollMessage(#msg)
@@ -56,5 +59,7 @@ void DisplayOn(void);
 void DisplayOff(void);
 void DisplayClear(void);
 void DisplaySync(void);
+void SpinCCW(uint8_t digits);
+void SpinCW(uint8_t digits);
 #endif	/* DISPLAY_H */
 
