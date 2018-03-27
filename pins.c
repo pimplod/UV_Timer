@@ -44,7 +44,7 @@ void InitPins(void){
     PULLUPS_OFF();
 }
 
-void InitButtons(void){
+void InitButton(void){
     LED_BUTTON_TRIS = INPUT;
     BUTTON_LED_TRIS = OUTPUT;    
     BUTTON_LED_ON();

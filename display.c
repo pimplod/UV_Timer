@@ -59,7 +59,7 @@ void DisplayNumber(uint8_t digit, uint8_t value) {
 
 }
 
-void DisplayValue(uint16_t number) {
+void DisplayValue(int16_t number) {
 
     uint8_t hund = (number / 100) % 10;
     uint8_t tens = (number / 10) % 10;
@@ -95,7 +95,7 @@ void ScrollMessage(const char *string) {
     DisplayClear();
 
     while (string[i] != '\0') {
-        if (ledButton.pressed == true || encoderButton.pressed == true || flag.encode == true) {
+        if (ledButton.pressed == true || encoderButton.pressed == true ) {
             signal.scrollbreak = true;
             return;
         }
@@ -148,19 +148,18 @@ void DisplaySync(void) {
     MAX7219_SyncBuffer();
 }
 
-
 void SpinCCW(uint8_t digits) {
     uint16_t delayCount;
 
-    DisplayClear();
+    //DisplayClear();
     for (uint8_t i = 1; i < 7; i++) {
-        if(digits & DISP_HUND)
+        if (digits & DISP_HUND)
             maxBuffer[0] = (0x01 << i);
-        if(digits & DISP_TENS)
+        if (digits & DISP_TENS)
             maxBuffer[1] = (0x01 << i);
-        if(digits & DISP_ONES)
+        if (digits & DISP_ONES)
             maxBuffer[2] = (0x01 << i);
-        
+
         delayCount = t3Count + 2;
         while (delayCount > t3Count);
 
@@ -170,18 +169,65 @@ void SpinCCW(uint8_t digits) {
 void SpinCW(uint8_t digits) {
     uint16_t delayCount;
 
-    DisplayClear();
+    //DisplayClear();
     for (uint8_t i = 6; i > 0; i--) {
-        if(digits & DISP_HUND)
+        if (digits & DISP_HUND)
             maxBuffer[0] = (0x01 << i);
-        if(digits & DISP_TENS)
+        if (digits & DISP_TENS)
             maxBuffer[1] = (0x01 << i);
-        if(digits & DISP_ONES)
+        if (digits & DISP_ONES)
             maxBuffer[2] = (0x01 << i);
-        
+
         delayCount = t3Count + 2;
         while (delayCount > t3Count);
 
     }
 
+}
+
+void RotateDigits(void) {
+    uint8_t i = 8;
+    uint16_t delayCount;
+
+    while (i--) {
+
+        for (uint8_t y = 0; y < NUMBER_OF_DIGITS; y++) {
+            uint8_t c = maxBuffer[y];
+            c = ((c << 1) | (c >> 7));
+            maxBuffer[y] = (c  & 0x7E);
+        }
+
+        delayCount = t3Count + 2;
+        while (delayCount > t3Count);
+    }
+}
+
+void WipeRtoL(void) {
+
+    uint8_t mask[3] = {0x4F, 0x36, 0x79};
+    uint16_t delayCount;
+
+    for (int8_t i = 2; i >= 0; i--) {
+        for (uint8_t y = 0; y < 3; y++) {
+            maxBuffer[i] &= mask[y];
+
+            delayCount = t3Count + 2;
+            while (delayCount > t3Count);
+        }
+    }
+}
+
+void WipeLtoR(void) {
+
+    uint8_t mask[3] = {0x4F, 0x36, 0x79};
+    uint16_t delayCount;
+
+    for (uint8_t y = 0; y < 3; y++) {
+        for (int8_t i = 2; i >= 0; i--) {
+            maxBuffer[y] &= mask[i];
+
+            delayCount = t3Count + 2;
+            while (delayCount > t3Count);
+        }
+    }
 }

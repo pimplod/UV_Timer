@@ -33,10 +33,10 @@
 extern volatile uint16_t tmrCount;
 extern volatile uint16_t t3Count;
 extern volatile int16_t timerValue;
-extern volatile uint8_t eeSaveAddr;
+extern volatile uint8_t lastSaveAddr;
 extern volatile uint8_t dpDigit;
 
-enum mStates {POWER_ON = 0 , CHOOSE_OP, SET_TIMER, READY, ON_TIMED, TIMER_OVER, STOP_CALLED, ON_NT};
+enum mStates {POWER_ON = 0 , CHOOSE_OP, SET_TIMER, READY, ON_TIMED, TIMER_OVER, STOP_CALLED, TURN_ON, TURN_OFF, ERASE_DATA};
 
 extern volatile enum mStates mainState; 
 extern volatile enum mStates prevState;
@@ -48,9 +48,9 @@ typedef struct flagStruct {
     unsigned halfsec : 1;
     unsigned on : 1;
     unsigned main : 1;
-    unsigned ready : 1;
-    unsigned no_timer :1;
-    unsigned : 1;
+    unsigned stateChange : 1;
+    unsigned off :1;
+    unsigned latched: 1;
 } t_flags;
 
 extern volatile t_flags flag;

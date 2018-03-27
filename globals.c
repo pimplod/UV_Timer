@@ -36,13 +36,13 @@
 volatile uint16_t tmrCount = 0;
 volatile uint16_t t3Count = 0;
 volatile int16_t timerValue = 0;
-volatile uint8_t eeSaveAddr = 0;
-volatile uint8_t dpDigit = 0; 
+volatile uint8_t lastSaveAddr = 0;
+volatile uint8_t dpDigit = 0;
 
 volatile enum mStates mainState = POWER_ON;
 volatile enum mStates prevState = POWER_ON;
 
-volatile t_flags flag = {0, 0, 0, 0, 0, 0, 0};
+volatile t_flags flag = {0, 0, 0, 0, 0, 0, 0, 0};
 
 volatile t_signal signal = {0, 0, 0, 0, 0, 0, 0};
 
@@ -64,13 +64,13 @@ volatile t_coder coder;
 
 void InitHardwareVars(void) {
 
-     //initialize variables within the encoder struct
+    //initialize variables within the encoder struct
     coder.newstate = READ_ENCODER();
     coder.oldstate = coder.newstate;
     coder.direction = 0;
     coder.count = 0;
     coder.sign = 1;
-    
+
     encoderButton.down = false;
     encoderButton.latched = false;
     encoderButton.pressed = false;
@@ -87,8 +87,8 @@ void InitHardwareVars(void) {
 
     buttons[0] = &encoderButton;
     buttons[1] = &ledButton;
-    
-    eeSaveAddr = EEPROM_READ(SAVE_ADDR);
+
+    lastSaveAddr = EEPROM_READ(SAVE_ADDR);
 }
 
 void ClearButtons(void) {
@@ -102,14 +102,22 @@ void ClearButtons(void) {
 void ChangeState(enum mStates newState) {
     prevState = mainState;
     mainState = newState;
+    flag.stateChange = true;
 }
 
-void ClearLatched(void){
-    uint16_t wait;
-    wait = tmrCount+100;
-    while (wait > tmrCount) {
+void ClearLatched(void) {
+    uint16_t wait = 0x00;
+    //    wait = tmrCount+100;
+    //    while (wait > tmrCount) {
+    //        if (ledButton.latched)
+    //            wait = tmrCount + 100;
+    //    }
+    do {
+        if(flag.latched)
+            SpinCW(0x07);
         if (ledButton.latched)
             wait = tmrCount + 100;
-    }
+    } while (wait > tmrCount);
+    flag.latched = false;
     ClearButtons();
 }

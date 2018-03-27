@@ -47,13 +47,6 @@ void InitSystem(void){
     InitTMR0();
     InitTMR1();
     InitTMR3();
-//    InitEncoder();
-//    InitButtons();
-//    InitBuzzer();
-//    InitRelay();
-//    InitHardwareVars();
-    //INTERRUPT_LOW_ENABLE();
-    //INTERRUPT_HIGH_ENABLE();
 }
 
 void InitOscillator(void){
@@ -73,11 +66,17 @@ void InitOscillator(void){
 }
 
 void InitHardware(void){
-    
+    //Assign and Initialize resources for encoder 
     InitEncoder();
-    InitButtons();
+    //Assign pins and turn on button led
+    InitButton();
+    //Initialize PWM for buzzer
     InitBuzzer();
+    //Assign pin for relay
     InitRelay();
+    //Open Communication with Display Driver
+    InitDisplay();
+    //Initialize hardware structure variables with starting values
     InitHardwareVars();
 }
 

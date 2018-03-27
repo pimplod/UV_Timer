@@ -49,7 +49,7 @@
  */
 void InitDisplay(void);
 void DisplayDP(uint8_t digit);
-void DisplayValue(uint16_t number);
+void DisplayValue(int16_t number);
 void DisplayNumber(uint8_t digit, uint8_t value);
 void DisplayChar(uint8_t digit, uint8_t value);
 void DisplayMsg(const char *msg);
@@ -61,5 +61,8 @@ void DisplayClear(void);
 void DisplaySync(void);
 void SpinCCW(uint8_t digits);
 void SpinCW(uint8_t digits);
+void RotateDigits(void);
+void WipeRtoL(void);
+void WipeLtoR(void);
 #endif	/* DISPLAY_H */
 

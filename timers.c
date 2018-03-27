@@ -28,7 +28,6 @@
 
 //Project
 #include "timers.h"
-//#include "user.h"
 /* ***********************************************************************//**
  *              @Section: GLOBAL VARIABLES
  *****************************************************************************/
@@ -86,7 +85,7 @@ void TMR0_WriteTimer(uint8_t value) {
 }
 
 void TMR0_ISR(void) {
-
+    
     INTCONbits.TMR0IF = 0;
     tmrCount++;
     if (tmrCount % 2)

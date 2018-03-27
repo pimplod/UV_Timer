@@ -28,7 +28,6 @@
 
 //Project
 #include "interrupt.h"
-//#include "user.h"
 
 /* ***********************************************************************//**
  *              @Section: GLOBAL VARIABLES
@@ -74,8 +73,5 @@ void interrupt low_priority IntLow(void) {
         TMR0_ISR();
     }else if (INTCONbits.RABIE == 1 && INTCONbits.RABIF == 1) {
         EncoderISR();
-        //PORTA;
-        //PORTB;
-        //INTCONbits.RABIF = 0;
     }
 }

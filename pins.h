@@ -85,7 +85,7 @@
         @Section: System APIs
  */
 void InitPins(void);
-void InitButtons(void);
+void InitButton(void);
 void InitRelay(void);
 void InitBuzzer(void);
 //void Buzzer(void);

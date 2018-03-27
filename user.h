@@ -44,6 +44,7 @@ void SaveTime(int16_t time);
 void ChooseOperation(void);
 void SetTimer(void);
 void HandleButtons(void);
+void EraseData(void);
 //void NewSet(void);
 #endif	/* USER_H */
 

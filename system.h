@@ -50,7 +50,7 @@
 #define SAVE_SIZE       0x03
 #define SAVE_ADDR       0x01
 #define EEPROM_SIZE     256
-#define EE_LAST_SAVE_ADDR     0xFD  
+#define EE_LAST_SAVE_ADDR     0xFC  
 #define EE_FIRST_SAVE_ADDR    0x03
 #define LAST_ONES       0x03
 #define LAST_TENS       0x04
